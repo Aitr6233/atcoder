@@ -73,3 +73,51 @@ for i in range(1, H+1):
 解説ではBFSやDFSで探索を行う内容だった。<br>
 まだ演習が足りていないことと、BFSとDFSについて理解できていないことが今回解けなかった原因なので<br>
 abcの過去問のC問題の数をこなして、必要なアルゴリズムの知識を埋めていこうと思う。<br>
+
+(10/22 追記)<br>
+基本的なBFSの問題だった。<br>
+参考：https://qiita.com/hyouchun/items/7c57b6fc56a35788e448 <br>
+
+
+＜解答コード＞<br>
+```
+from collections import deque
+
+# BFS関数
+def bfs(start_x, start_y):
+    que = deque()
+    que.append((start_x, start_y))
+    
+    while que:
+        next_x, next_y = que.popleft()
+        
+        for ni, nj in neighbor8(next_x, next_y):
+            if not seen[ni][nj] and S[ni][nj] == '#':
+                seen[ni][nj] = True
+                que.append((ni, nj))
+            
+            
+# 隣接する8頂点のリスト
+def neighbor8(i, j):
+    lst = []
+    for di in [-1, 0, 1]:
+        for dj in [-1, 0, 1]:
+            if di == dj == 0: continue
+            if 0 <= i + di < H and 0 <= j + dj < W:
+                lst.append((i + di, j + dj))
+    return lst
+
+# 入力
+H, W = map(int, input().split())
+S = [input() for _ in range(H)]
+
+# 処理内容
+seen = [[False] * W for _ in range(H)]  # 探索済みのマスならTrue
+ans = 0
+for i in range(H):
+    for j in range(W):
+        if not seen[i][j] and S[i][j] == '#':
+            bfs(i, j)
+            ans += 1
+print(ans)
+```
