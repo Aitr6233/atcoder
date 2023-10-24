@@ -1,34 +1,35 @@
-class UnionFiind():
+class DSU:
+    def __init__(self, n):
+        self._n = n
+        self.parent_or_size = [-1] * n
     
-    def __init__(self, max_size: int):
-        # 要素の数分だけ配列を作る。最初は全要素がそれぞれ根である。
-        self.parent = [i for i in range(max_size)]
+    def merge(self, a, b):
+        assert 0 <= a < self._n
+        assert 0 <= b < self._n
+        x, y = self.leader(a), self.leader(b)
+        if x == y: return x
+        if -self.parent_or_size[x] < -self.parent_or_size[y]: x, y = y, x
+        self.parent_or_size[x] += self.parent_or_size[y]
+        self.parent_or_size[y] = x
+        return x
+
+    def same(self, a, b):
+        assert 0 <= a < self._n
+        assert 0 <= b < self._n
+        return self.leader(a) == self.leader(b)
+
+    def leader(self, a):
+        assert 0 <= a < self._n
+        if self.parent_or_size[a] < 0: return a
+        self.parent_or_size[a] = self.leader(self.parent_or_size[a])
+        return self.parent_or_size[a]
     
-    # あるxの根の値を探す関数
-    def find_root(self, x):
-        # xの根がx, すなわち自分が根なら自分の値を返す。
-        if self.parent[x] == x:
-            return x
-        # 自分が根じゃない時は、再帰的に自分の根はどれかをチェックする。
-        else:
-            self.parent[x] = self.find_root(self.parent[x])
-            return self.parent[x]
-        
-    # 新しく結合を定義する
-    def linking(self, x1, x2):
-        # 根が一致していたら何もしない
-        if self.find_root(x1) == self.find_root(x2):
-            return
-        # 根が違う場合、x2の根をx1の根にする
-        else:
-            self.parent[self.parent[x2]] = self.parent[x1]
-            
-    # 二つの値の根が同じかどうか判定する
-    def check_link(self,x1, x2):
-        # 根が一位しているならばTrue
-        if self.find_root(x1) == self.find_root(x2):
-            return True
-        # 根が一致していないならばFalse
-        else:
-            False
-            
+    def size(self, a):
+        assert 0 <= a < self._n
+        return -self.parent_or_size[self.leader(a)]
+    
+    def groups(self):
+        leader_buf = [self.leader(i) for i in range(self._n)]
+        result = [[] for _ in range(self._n)]
+        for i in range(self._n): result[leader_buf[i]].append(i)
+        return [r for r in result if r != []]
